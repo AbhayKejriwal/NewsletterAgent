@@ -4,3 +4,5 @@ token.json
 /test/*
 __pycache__
 token.json
+summary.html
+summary.txt
