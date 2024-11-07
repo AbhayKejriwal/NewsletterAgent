@@ -5,20 +5,10 @@ def processEmails(emails, count):
   for email in emails:
     response = astn.generate(str(email))
     #save in a file
-    with open('summary.html', 'w') as file:
-      file.write(str(response))
+    # with open('summary.html', 'w') as file:
+    #   file.write(str(response))
     with open('summary.txt', 'w') as file:
       file.write(str(response))
-    # res = json.loads(response) # Parse the JSON string into a dictionary
-    # print(response)
-    
-    # email['Summary'] = res['Summary']
-    # email['Category'] = res['Category'] 
-
-    # if res['Category'] != 'Cannot Classify':
-    #   ml.addLabels(email, [res['Category']])
-    #   if res['Category'] != 'Priority':
-    #     ml.removeLabels(email, ['INBOX'])
     print("Emails Processed:", count)
     count += 1
   return count
