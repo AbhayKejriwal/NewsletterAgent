@@ -1,29 +1,17 @@
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
-from google.ai.generativelanguage_v1beta.types import content
 
 load_dotenv()
-with open("Prefs.txt", "r", encoding="utf-8") as f:
-  prefs = f.read()
 
 def generate(email):
   genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
   model = genai.GenerativeModel(model_name="gemini-1.5-flash")
   
-  prompt = """You are a personal email assistant. Your job is to know the user's details, priorities, preferences and requirements about their email and filter out the content and display it in the set format.
+  prompt = """You are a personal email newsletter reader and filter. Your task is to read the email message and provide a brief summary of the mail. You should also filter advertisements, promotional content, and other irrelevant content from the email and remove them. So, the end result should be an article form of the newsletter than begins with a summary of the email message followed by the main content of the email, which should be free of any promotional content and repetitive information.
 
-  #User Details, Preferences & Special Instructions: """ + prefs + """
-
-  The email message is provide in HTML format and the output should be strictly returned in the specified JSON format with no other prefix or suffix. Filter the right content according to my requirements, provide a brief summary of the mail content and categorize the mail. The various default categories are: \"Priority\", \"Not Important\", \"Useless\" and \"Cannot Clasify\"(not enough data in preferences to categorize the mail).
-
-  !!!The output should be strictly returned in the specified JSON format with no prefix or suffix like json. You do not need to specify it is a JSON output. It is assumed it is a pure json without any issue!!!
-  OUTPUT FORMAT:
-  {
-  \"Summary\": \"<summary_of_the_mail>\",
-  \"Category\": \"<category_of_the_mail>\"
-  }
-
+  The email message is provide in HTML format and the output should also be returned in HTML or markdown format.
+  
   EMAIL MESSAGE:
   """ + email + """
   
@@ -39,7 +27,7 @@ def generate(email):
 
 # Driver and test code
 def main():
-  with open("1917a9d2c104454d.txt", "r", encoding="utf-8") as f:
+  with open("sample.txt", "r", encoding="utf-8") as f:
     message = f.read()
   summary = generate(message)
   print(summary)
