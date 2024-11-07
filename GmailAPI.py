@@ -60,18 +60,21 @@ def getEmail(service, message):
 
   return email
 
-def listEmails(labels=['INBOX'], state='is:unread'):
+def listEmails(labels=[], state=''):
   creds = getCredentials() # this line gets the credentials of the user to access the gmail account
   service = build('gmail', 'v1', credentials=creds)
+  label_ids = []
+  for label in labels:
+    label_ids.append(get_label_id(label))
   
   if not labels and not state:
     results = service.users().messages().list(userId='me').execute
   elif not state:
-    results = service.users().messages().list(userId='me', labelIds=labels).execute()
+    results = service.users().messages().list(userId='me', labelIds=label_ids).execute()
   elif not labels:
     results = service.users().messages().list(userId='me', q=state).execute()
   else:
-    results = service.users().messages().list(userId='me', labelIds=labels, q=state).execute()
+    results = service.users().messages().list(userId='me', labelIds=label_ids, q=state).execute()
 
   messages = results.get('messages', [])
   return messages
