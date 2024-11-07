@@ -1,53 +1,51 @@
 import GmailAPI as ml
 import Agent as astn
-import json
-
-
-def createInitialLabels():
-  ml.create_label("Priority", "#000000", "#cc3a21")
-  ml.create_label("Not Important", "#000000", "#ffad47")
-  ml.create_label("Useless", "#000000", "#4a86e8")
-  # ml.create_label("Cannot Classify", "#000000", "#cccccc")
-
 
 def processEmails(emails, count):
   for email in emails:
     response = astn.generate(str(email))
-    res = json.loads(response) # Parse the JSON string into a dictionary
-    print(res)
+    #save in a file
+    with open('summary.html', 'w') as file:
+      file.write(str(response))
+    with open('summary.txt', 'w') as file:
+      file.write(str(response))
+    # res = json.loads(response) # Parse the JSON string into a dictionary
+    # print(response)
     
-    email['Summary'] = res['Summary']
-    email['Category'] = res['Category'] 
+    # email['Summary'] = res['Summary']
+    # email['Category'] = res['Category'] 
 
-    if res['Category'] != 'Cannot Classify':
-      ml.addLabels(email, [res['Category']])
-      if res['Category'] != 'Priority':
-        ml.removeLabels(email, ['INBOX'])
+    # if res['Category'] != 'Cannot Classify':
+    #   ml.addLabels(email, [res['Category']])
+    #   if res['Category'] != 'Priority':
+    #     ml.removeLabels(email, ['INBOX'])
     print("Emails Processed:", count)
     count += 1
   return count
 
+def batchProcessEmails(mails, batch_size):
+  count = 1
+  for i in range(0, 10, batch_size):
+    print("Batch", i//batch_size + 1) # printing the batch number
+    batch = mails[i:i+batch_size]
+    print("Processing", len(batch), "emails.") # printing the number of emails in the batch
+    emails = ml.getEmails(batch)
+    count = processEmails(emails, count)
+  print("No more emails.")
+  return  
 
 def main():
-  labels = ['INBOX'] # this line specifies the label of the emails to be read
+  labels = ['Productivity & Life'] # this line specifies the label of the emails to be read
   state = "is:unread" # this line specifies the state of the emails to be read
   
-  # emails = ml.getEmails(labels, state)
   mails = ml.listEmails(labels, state)
   batch_size = 10
-  
+  mails = mails[:1]
   if not mails:
     print("No emails found.")
   else:
     print(len(mails), "emails found.")
-    count = 1
-    for i in range(0, len(mails), batch_size):
-      batch = mails[i:i+batch_size]
-      print(batch)
-      emails = ml.getEmails(batch)
-      count = processEmails(emails, count)
-    else:
-      print("No more emails.")
+    batchProcessEmails(mails, batch_size)
 
 if __name__ == "__main__":
   main()
