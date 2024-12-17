@@ -1,15 +1,34 @@
 import GmailAPI as ml
 import Agent as astn
+import os
+import re
+
+def sanitize_filename(filename):
+  # Remove invalid characters for file names
+  return re.sub(r'[<>:"/\\|?*\x00-\x1f\x80-\xff]', '_', filename)
 
 def processEmails(emails, count):
   for email in emails:
     response = astn.generate(str(email))
-    #save in a file
-    # with open('summary.html', 'w') as file:
-    #   file.write(str(response))
-    with open('summary.txt', 'w') as file:
+
+    # Save in newsletters folder with sanitized subject as file name
+    file_name = sanitize_filename(str(email['Subject'])) + '.txt'
+    
+    file_path = os.path.join(os.getcwd(), "Newsletters")
+    os.makedirs(file_path, exist_ok=True)
+    file_path = os.path.join(file_path, file_name)
+    
+    with open(file_path, 'w', encoding='utf-8') as file:
       file.write(str(response))
+    
+    try:
+      # Mark email as read and archive it
+      ml.removeLabels(email, ['UNREAD', 'INBOX'])
+    except:
+      print("Error in marking email as read.")
+      
     print("Emails Processed:", count)
+  
     count += 1
   return count
 
@@ -30,7 +49,7 @@ def main():
   
   mails = ml.listEmails(labels, state)
   batch_size = 10
-  mails = mails[:1]
+  # mails = mails[:1]
   if not mails:
     print("No emails found.")
   else:

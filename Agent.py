@@ -10,16 +10,24 @@ def generate(email):
   
   prompt = """You are a personal email newsletter reader and filter. Your task is to read the email message and provide a brief summary of the mail. You should also filter advertisements, promotional content, and other irrelevant content from the email and remove them. So, the end result should be an article form of the newsletter than begins with a summary of the email message followed by the main content of the email, which should be free of any promotional content and repetitive information.
 
-  The email message is provide in HTML format and the output should also be returned in HTML or markdown format.
+  The email message is provide in HTML format and the output should also be returned in markdown format.
   
   EMAIL MESSAGE:
   """ + email + """
   
   """
   # print(prompt)
+        
   try:
     response = model.generate_content(prompt)
-    return response.text
+    try:
+      return response.text
+    except:        
+      if response and response.candidates:
+        return response.candidates[0].content
+      else:
+        print("No content generated.")
+        return None
   except Exception as e:
     print("Error in generating response.")
     print(e)
